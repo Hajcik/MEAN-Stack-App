@@ -24,4 +24,9 @@ router.use(function(req, res, next) {
     router.get('/emailDuplication', userController.emailDuplication)
     router.get('/usernameDuplication', userController.usernameDuplication)
     
+    router.post('/auth/profile', userController.profile)
+    router.post('/auth/tasks', [ userController.loginRequired, userController.profile ])
+    router.post('/auth/register', userController.register)
+    router.post('/auth/sign_in', userController.sign_in)
+
 module.exports = router
