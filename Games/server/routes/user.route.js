@@ -21,8 +21,6 @@ router.use(function(req, res, next) {
     router.delete('/:id', userController.deleteUser)
     router.get('/verifyToken', userController.verifyToken)
     router.get('/isAdministrator/:id', userController.isAdministrator)
-    router.get('/emailDuplication', userController.emailDuplication)
-    router.get('/usernameDuplication', userController.usernameDuplication)
     
     router.post('/auth/profile', userController.profile)
     router.post('/auth/tasks', [ userController.loginRequired, userController.profile ])

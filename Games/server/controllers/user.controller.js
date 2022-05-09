@@ -6,6 +6,15 @@ const jwt = require('jsonwebtoken')
 const config = require('../config/auth.config.js')
 const authConfig = require('../config/auth.config.js')
 
+const getUsersIndex = async (req, res) => {
+    try {
+        var usersArray = await (await User.find()).reverse()
+        res.render('users', { title: 'Users Database Page', users: usersArray})
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
 const getUsers = async (req, res) => {
     try {
         const usersInfo = await (await User.find()).reverse()
@@ -37,25 +46,7 @@ const createUser = async (req, res) => {
     }
 }
 
-const emailDuplication = async (req, res) => {
-    User.findOne({ email: req.body.email }).exec((err, user) => {
-        if(err) { res.status(500).send({ message: err })
-        return
-        }
 
-        if(user) { res.status(400).send({ message: 'Email taken' })}
-    })
-}
-
-const usernameDuplication = async (req, res) => {
-    User.findOne({ username: req.body.username }).exec((err, user) =>{
-        if(err) { res.status(500).send({ message: err })
-        return
-        }
-
-        if(user) { res.status(400).send({ message: 'Username taken' })}
-    })
-}
 
 const deleteUser = async (req, res) => {
     const { id } = req.params
@@ -81,50 +72,49 @@ const verifyToken = (req, res, next) => {
 
 const isAdministrator = (req, res, next) => {
     const { userId } = req.params
-    User.findById(userId).exec((err, user) => {
+    var foundUser = User.findById(userId).exec((err, user) => {
         if(err) { res.status(500).json({ message: err })
         return
     }
-    Role.find({ _id: { $in: user.roles }}, (err, roles) => {
-        if(err) { res.status(500).json({ message: err })
+    
+    if(foundUser.role === "Administrator"){
+        next()
+        console.log(user.username + "is admin")
         return
-        }
-
-        for(let i = 0; i < roles.length; i++) {
-            if(roles[i].name === "Administrator"){
-                console.log('administrator!')
-                next()
-                return
-            }
-        }
-
+    }
         res.status(403).json({ message: "Access denied! Admins only!" })
-        return
-        })
+        return 
     })
 }
 
 const register = (req, res, next) => {
     const newUser = new User(req.body)
     newUser.hash_password = bcrypt.hashSync(req.body.password, 10)
-    newUser.save(function(err, user){
-        if(err) {
-            return res.status(400).json({ message: error.message })
-        } else {
-            user.hash_password = undefined
-            return res.json(user)
-        }
-    })
+
+    let tmpEmail = User.findOne({ email: newUser.email })
+    let tmpUsername = User.findOne({ username: newUser.username })
+    
+    console.log(tmpEmail)
+    console.log(tmpUsername)
+    
+        newUser.save(function(err, user){
+            if(err) {
+                return res.status(400).json({ message: error.message })
+            } else {
+                user.hash_password = undefined
+                return res.json(user)
+            }
+        })
 }
 
 const sign_in = (req, res, next) => {
-    User.findOne({ email: req.body.email }, function(err, user){
+    User.findOne({ username: req.body.username }, function(err, user){
         if(err) throw err
         if(!user || !user.comparePassword(req.body.password)) {
             return res.status(401).json({ message: 'Authentication failed. Invalid email or password'})
         }
         return res.json({ token: jwt.sign({ email: user.email, username: user.username, _id: user._id }, authConfig.secret)})
-    }
+        }
     )
 }
 
@@ -144,7 +134,7 @@ const profile = (req, res, next) => {
         return res.status(401).json({ message: 'Invalid token.' })
     }
 }
-module.exports = { getUser, getUsers, 
+module.exports = { getUser, getUsers, getUsersIndex,
     createUser, deleteUser, verifyToken, 
-    isAdministrator, usernameDuplication, emailDuplication,
+    isAdministrator,
     register, sign_in, loginRequired, profile}

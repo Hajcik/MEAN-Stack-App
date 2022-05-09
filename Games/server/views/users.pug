@@ -1,0 +1,66 @@
+extends layout
+block content
+    .container.text-center
+      .row
+        .col-sm-3.well
+          .well
+            p
+              h2 My Profile
+              span.label.label-primary USERNAME HERE!!!
+            img.img-circle(src='https://cdn5.f-cdn.com/contestentries/1733723/43055135/5e49ec7ad607a_thumb900.jpg' height='150' width='150' alt='Avatar')
+          .well
+            p
+              a(href='#') Interests
+            p
+              span.label.label-default News
+              span.label.label-primary W3Schools
+              span.label.label-success Labels
+              span.label.label-info Football
+              span.label.label-warning Gaming
+              span.label.label-danger Friends
+          p
+            a(href='#') Link
+          p
+            a(href='#') Link
+          p
+            a(href='#') Link
+        .col-sm-7
+          .row
+            .col-sm-12
+              .panel.panel-default.text-left
+                .panel-body
+                  p Users Database
+          each user in users
+            .row
+            .col-sm-3
+              .well
+                p #{user.username}
+                img.img-circle(src='https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG-High-Quality-Image.png' height='55' width='55' alt='Avatar')
+            .col-sm-9
+              .well
+                p
+                  | Email Address: #{user.email}
+                p
+                  | Created on: #{user.created}
+                p
+                  | Roles: #{user.roles}
+        .col-sm-2.well
+          .thumbnail
+            p
+              strong Current Time
+            p(id='clock') time
+            button.btn.btn-primary(id='clock') Info
+          .well
+            p Create New User
+            form(action='api/users/newuser', method='post')
+              div(data-role='fieldcontain')
+                fieldset(data-role='controlgroup')
+                  label(for='username') Username
+                    input(id='username', type='text', value='', placeholder='Username', name='username', required='required')
+              
+              div(data-role='fieldcontain')
+                fieldset(data-role='controlgroup')
+                  label(for='username') Email
+                    input(id='username', type='text', value='', placeholder='Username', name='username', required='required')
+          .well
+            p ADS

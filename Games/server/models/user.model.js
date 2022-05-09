@@ -19,12 +19,10 @@ const userSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    roles: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Role'
-        }
-    ]
+    role: {
+        type: String,
+        default: "User"
+    }
 })
 
 userSchema.methods.comparePassword = function(password) {

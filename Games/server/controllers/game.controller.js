@@ -1,6 +1,15 @@
 const mongoose = require('mongoose')
 const GameInfo = require('../models/game.model.js')
 
+const getGamesIndex = async (req, res) => {
+    try {
+        var gamesArray = await (await GameInfo.find()).reverse()
+        res.render('games', {title: 'Games Database Page', games: gamesArray })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
 const getGames = async (req, res) => {
     try {
         const gamesInfo = await (await GameInfo.find()).reverse()
@@ -51,4 +60,4 @@ const deleteGame = async (req, res) => {
     return res.json({ message: 'Game deleted succesfully!' })
 }
 
-module.exports = { getGames, getGame, createGame, updateGame, deleteGame }
+module.exports = { getGames, getGame, createGame, updateGame, deleteGame, getGamesIndex}
